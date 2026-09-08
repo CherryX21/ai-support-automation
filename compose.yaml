@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: ai-support-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  api:
+    build:
+      context: ./backend
+    container_name: ai-support-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - postgres
+    ports:
+      - "${API_PORT}:8000"
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: ai-support-n8n
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ}
+      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE}
+    depends_on:
+      - postgres
+      - api
+    ports:
+      - "${N8N_PORT}:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/workflows
+
+volumes:
+  postgres_data:
+  n8n_data:

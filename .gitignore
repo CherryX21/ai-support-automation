@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Env files
+.env
+
+# VS / editors
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# n8n / local runtime data
+n8n_data/
+postgres_data/
+
+# Python cache in subfolders
+backend/**/__pycache__/
+
+# If you later add local db files
+*.sqlite3

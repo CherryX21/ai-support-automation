@@ -10,3 +10,10 @@ class Order(BaseModel):
 
 class OrderUpdate(BaseModel):
     status: str
+
+
+class TicketCreate(BaseModel):
+    customer_id: str
+    order_id: str | None = None
+    category: str
+    message: str

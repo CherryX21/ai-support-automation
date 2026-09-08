@@ -11,6 +11,7 @@ Pet project for learning workflow automation with n8n, FastAPI, and PostgreSQL.
 ## Run
 ```bash
 docker compose up --build
+```
 
 ## Services
 n8n: http://localhost:5678

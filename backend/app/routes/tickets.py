@@ -1,6 +1,6 @@
 import psycopg
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from psycopg.rows import dict_row
 
 from app.database import DATABASE_URL
@@ -18,6 +18,38 @@ router = APIRouter(
 def create_ticket(ticket: TicketCreate):
 	with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
 		with conn.cursor() as cur:
+			cur.execute(
+				"""
+				SELECT 1
+				FROM customers
+				WHERE customer_id = %s
+				""",
+				(ticket.customer_id,),
+			)
+
+			if cur.fetchone() is None:
+				raise HTTPException(
+					status_code=404,
+					detail="Customer not found",
+				)
+
+			if ticket.order_id is not None:
+				cur.execute(
+					"""
+					SELECT 1
+					FROM orders
+					WHERE order_id = %s
+					  AND customer_id = %s
+					""",
+					(ticket.order_id, ticket.customer_id),
+				)
+
+				if cur.fetchone() is None:
+					raise HTTPException(
+						status_code=404,
+						detail="Order not found for this customer",
+					)
+
 			cur.execute(
 				"""
 				INSERT INTO support_tickets (

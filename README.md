@@ -128,13 +128,17 @@ ai-support-automation/
 
 FastAPI provides REST endpoints for customers, orders, and support tickets.
 
-![FastAPI Swagger UI](docs/images/Swagger.png)
+<p align="center">
+  <img src="docs/images/Swagger.png" width="850" alt="FastAPI Swagger UI">
+</p>
 
 ## Human Escalation
 
 Requests that cannot be safely automated are escalated to a human operator through Discord.
 
-![Discord escalation notification](docs/images/DiscordChat.png)
+<p align="center">
+  <img src="docs/images/DiscordChat.png" width="650" alt="Discord escalation notification">
+</p>
 
 ## Running Locally
 

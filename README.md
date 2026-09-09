@@ -120,6 +120,21 @@ ai-support-automation/
 ├── .env.example
 └── README.md
 ```
+## Workflow
+
+![n8n workflow](docs/images/Workflow.png)
+
+## API
+
+FastAPI provides REST endpoints for customers, orders, and support tickets.
+
+![FastAPI Swagger UI](docs/images/Swagger.png)
+
+## Human Escalation
+
+Requests that cannot be safely automated are escalated to a human operator through Discord.
+
+![Discord escalation notification](docs/images/DiscordChat.png)
 
 ## Running Locally
 

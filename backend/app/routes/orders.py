@@ -32,13 +32,12 @@ def get_orders(status: str, min_total: float):
             return cur.fetchall()
 
 
-# GET /orders/ORD-1
+# GET /orders/ORD-1?customer_id=CUST-001
 @router.get("/{order_id}")
-def get_order(order_id: str):
+def get_order(order_id: str, customer_id: str | None = None):
     with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                """
+            query = """
                 SELECT
                     orders.order_id,
                     orders.customer_id,
@@ -49,75 +48,23 @@ def get_order(order_id: str):
                 JOIN customers
                     ON orders.customer_id = customers.customer_id
                 WHERE orders.order_id = %s
-                """,
-                (order_id,),
-            )
+            """
+            params = [order_id]
 
+            if customer_id:
+                query += " AND orders.customer_id = %s"
+                params.append(customer_id)
+
+            cur.execute(query, tuple(params))
             order = cur.fetchone()
 
     if order is None:
         raise HTTPException(
             status_code=404,
-            detail="Order not found"
+            detail="Order not found for this customer"
         )
 
     return order
-
-
-# POST /orders
-@router.post("")
-def create_order(order: Order):
-    with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO orders (
-                    order_id,
-                    customer_id,
-                    status,
-                    total
-                )
-                VALUES (%s, %s, %s, %s)
-                RETURNING order_id, customer_id, status, total
-                """,
-                (
-                    order.order_id,
-                    order.customer_id,
-                    order.status,
-                    order.total,
-                ),
-            )
-
-            return cur.fetchone()
-
-
-# PATCH /orders/ORD-1
-@router.patch("/{order_id}")
-def update_order(order_id: str, order_update: OrderUpdate):
-    with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                UPDATE orders
-                SET status = %s
-                WHERE order_id = %s
-                RETURNING order_id, customer_id, status, total
-                """,
-                (
-                    order_update.status,
-                    order_id,
-                ),
-            )
-
-            result = cur.fetchone()
-
-    if result is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Order not found"
-        )
-
-    return result
 
 
 # DELETE /orders/ORD-1
